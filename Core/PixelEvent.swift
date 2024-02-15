@@ -29,7 +29,22 @@ extension Pixel {
 
     // swiftlint:disable:next type_body_length
     public enum Event {
-        
+
+        case investigateOmniBarSubmit
+        case investigateTabLoadEnter
+        case investigateTabLoadExit
+        case investigateTabRequestLoadEnter
+        case investigateTabRefresh
+        case investigateTabRequestLoadExit
+        case investigateTabProvisionalNav
+        case investigateTabDidCommitNav
+        case investigateTabSendNavigation
+        case investigateTabShouldWaitForCBR
+        case investigateUCCDidInstallCBR
+        case investigateCBUpdatingBufferedValue
+
+        case investigateHasContentBlockingRules
+
         case appLaunch
         case refreshPressed
         case pullToRefresh
@@ -535,6 +550,20 @@ extension Pixel.Event {
     
     public var name: String {
         switch self {
+
+        case .investigateOmniBarSubmit: return "m_d_inv_omni_bar_submit"
+        case .investigateTabLoadEnter: return "m_d_inv_tab_load_enter"
+        case .investigateTabLoadExit: return "m_d_inv_tab_load_exit"
+        case .investigateTabRequestLoadEnter: return "m_d_inv_tab_req_load_enter"
+        case .investigateTabRequestLoadExit: return "m_d_inv_tab_req_load_exit"
+        case .investigateTabSendNavigation: return "m_d_inv_tab_send_nav"
+        case .investigateTabProvisionalNav: return "m_d_inv_tab_prov_nav"
+        case .investigateTabDidCommitNav: return "m_d_inv_tab_did_commit"
+        case .investigateTabRefresh: return "m_d_inv_tab_refresh"
+        case .investigateTabShouldWaitForCBR: return "m_d_inv_should_wait_for_cbr"
+        case .investigateHasContentBlockingRules: return "m_d_inv_has_cbr"
+        case .investigateUCCDidInstallCBR: return "m_d_inv_ucc_did_install_cbr"
+        case .investigateCBUpdatingBufferedValue: return "m_d_inv_cbupdating_buffered_value"
         case .appLaunch: return "ml"
         case .refreshPressed: return "m_r"
         case .pullToRefresh: return "m_pull-to-reload"

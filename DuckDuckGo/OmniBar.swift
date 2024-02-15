@@ -403,6 +403,9 @@ class OmniBar: UIView {
     }
 
     func onQuerySubmitted() {
+        Pixel.fire(pixel: .investigateOmniBarSubmit,
+                   withAdditionalParameters: ["hasDelegate" : omniDelegate != nil ? "true" : "false"],
+                   includedParameters: [])
         if let suggestion = omniDelegate?.selectedSuggestion() {
             omniDelegate?.onOmniSuggestionSelected(suggestion)
         } else {

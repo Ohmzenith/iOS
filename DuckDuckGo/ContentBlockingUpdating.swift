@@ -50,7 +50,11 @@ public final class ContentBlockingUpdating {
         }
     }
 
-    @Published private var bufferedValue: NewContent?
+    @Published private var bufferedValue: NewContent? {
+        didSet {
+            Pixel.fire(pixel: .investigateCBUpdatingBufferedValue, withAdditionalParameters: ["value": bufferedValue != nil ? "present" : "nil"])
+        }
+    }
     private var cancellable: AnyCancellable?
 
     private(set) var userContentBlockingAssets: AnyPublisher<NewContent, Never>!

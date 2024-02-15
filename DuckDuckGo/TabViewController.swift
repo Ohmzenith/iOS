@@ -524,6 +524,7 @@ class TabViewController: UIViewController {
     }
     
     private func load(url: URL, didUpgradeURL: Bool) {
+        Pixel.fire(pixel: .investigateTabLoadEnter)
         if !didUpgradeURL {
             lastUpgradedURL = nil
             privacyInfo?.connectionUpgradedTo = nil
@@ -545,6 +546,7 @@ class TabViewController: UIViewController {
                                    onStartExtracting: { showProgressIndicator() },
                                    onFinishExtracting: { },
                                    completion: { [weak self] url in
+            Pixel.fire(pixel: .investigateTabLoadExit)
             self?.load(urlRequest: .userInitiated(url))
         })
     }
@@ -559,6 +561,7 @@ class TabViewController: UIViewController {
     }
     
     private func load(urlRequest: URLRequest) {
+        Pixel.fire(pixel: .investigateTabRequestLoadEnter)
         loadViewIfNeeded()
         
         if let url = urlRequest.url, !shouldReissueSearch(for: url) {
@@ -572,6 +575,7 @@ class TabViewController: UIViewController {
         webView.stopLoading()
         dismissJSAlertIfNeeded()
         webView.load(urlRequest)
+        Pixel.fire(pixel: .investigateTabRequestLoadExit)
     }
     
     // swiftlint:disable block_based_kvo
@@ -1024,6 +1028,7 @@ extension TabViewController: WKNavigationDelegate {
     }
     
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        Pixel.fire(pixel: .investigateTabDidCommitNav)
         if let url = webView.url {
             instrumentation.willLoad(url: url)
         }
@@ -1121,6 +1126,7 @@ extension TabViewController: WKNavigationDelegate {
     }
     
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        Pixel.fire(pixel: .investigateTabProvisionalNav)
         lastError = nil
         cancelTrackerNetworksAnimation()
         shouldReloadOnError = false
@@ -1452,17 +1458,21 @@ extension TabViewController: WKNavigationDelegate {
             || !ContentBlocking.shared.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) {
 
             rulesCompilationMonitor.reportNavigationDidNotWaitForRules()
+            Pixel.fire(pixel: .investigateTabShouldWaitForCBR, withAdditionalParameters: ["return" : "false"])
             return false
         }
 
         Task {
             rulesCompilationMonitor.tabWillWaitForRulesCompilation(tabModel.uid)
             showProgressIndicator()
+            Pixel.fire(pixel: .investigateTabShouldWaitForCBR, withAdditionalParameters: ["task" : "await1"])
             await userContentController.awaitContentBlockingAssetsInstalled()
             rulesCompilationMonitor.reportTabFinishedWaitingForRules(tabModel.uid)
-
+            Pixel.fire(pixel: .investigateTabShouldWaitForCBR, withAdditionalParameters: ["task" : "await2"])
             await MainActor.run(body: completion)
         }
+
+        Pixel.fire(pixel: .investigateTabShouldWaitForCBR, withAdditionalParameters: ["return" : "true"])
         return true
     }
 
@@ -2082,6 +2092,7 @@ extension TabViewController: UIGestureRecognizerDelegate {
     }
 
     func refresh() {
+        Pixel.fire(pixel: .investigateTabRefresh)
         let url: URL?
         if isError || webView.url == nil {
             url = URL(string: chromeDelegate?.omniBar.textField.text ?? "")
@@ -2119,6 +2130,7 @@ extension TabViewController: UserContentControllerDelegate {
                                didInstallContentRuleLists contentRuleLists: [String: WKContentRuleList],
                                userScripts: UserScriptsProvider,
                                updateEvent: ContentBlockerRulesManager.UpdateEvent) {
+        Pixel.fire(pixel: .investigateUCCDidInstallCBR)
         guard let userScripts = userScripts as? UserScripts else { fatalError("Unexpected UserScripts") }
 
         userScripts.debugScript.instrumentation = instrumentation

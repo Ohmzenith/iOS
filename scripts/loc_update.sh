@@ -9,7 +9,7 @@ set -- "${base_dir}/DuckDuckGo" "${base_dir}/Widgets" "${base_dir}/PacketTunnelP
 
 for dir in "$@"; do
 	echo "Processing ${dir}"
-	find "${dir}/" -name "*.swift" -print0 | xargs -0 xcrun extractLocStrings -o "${dir}/en.lproj"
+	find "${dir}/" -type f \( -name "*.swift" -and -not -name "ExcludedUserText.swift" \) -print0 | xargs -0 xcrun extractLocStrings -o "${dir}/en.lproj"
 	iconv -f UTF-16 -t UTF8 "${dir}/en.lproj/Localizable.strings" > "${dir}/en.lproj/Localizable-UTF8.strings"
 	mv "${dir}/en.lproj/Localizable-UTF8.strings" "${dir}/en.lproj/Localizable.strings"
 done
@@ -19,7 +19,7 @@ set -- "${base_dir}/LocalPackages/SyncUI/Sources/SyncUI"
 
 for dir in "$@"; do
 	echo "Processing ${dir}"
-	find "${dir}/" -name "*.swift" -print0 | xargs -0 xcrun extractLocStrings -o "${dir}/Resources/en.lproj"
+	find "${dir}/" -type f \( -name "*.swift" -and -not -name "ExcludedUserText.swift" \) -print0 | xargs -0 xcrun extractLocStrings -o "${dir}/Resources/en.lproj"
 	iconv -f UTF-16 -t UTF8 "${dir}/Resources/en.lproj/Localizable.strings" > "${dir}/Resources/en.lproj/Localizable-UTF8.strings"
 	mv "${dir}/Resources/en.lproj/Localizable-UTF8.strings" "${dir}/Resources/en.lproj/Localizable.strings"
 done

@@ -187,6 +187,32 @@ public class Pixel {
         }
     }
     
+    /// Sends a given count Pixel every time is called, adding a `_c` suffix.
+    public static func fireCount(pixel: Pixel.Event,
+                                 forDeviceType deviceType: UIUserInterfaceIdiom? = UIDevice.current.userInterfaceIdiom,
+                                 withAdditionalParameters params: [String: String] = [:],
+                                 allowedQueryReservedCharacters: CharacterSet? = nil,
+                                 withHeaders headers: APIRequest.Headers = APIRequest.Headers(),
+                                 includedParameters: [QueryParameters] = [.atb, .appVersion],
+                                 onComplete: @escaping (Error?) -> Void = { _ in },
+                                 debounce: Int = 0) {
+        let date = Date().addingTimeInterval(-TimeInterval(debounce))
+        if !pixel.hasBeenFiredSince(pixelStorage: storage, date: date) {
+            fire(
+                pixelNamed: pixel.name + "_c",
+                forDeviceType: deviceType,
+                withAdditionalParameters: params,
+                allowedQueryReservedCharacters: allowedQueryReservedCharacters,
+                withHeaders: headers,
+                includedParameters: includedParameters,
+                onComplete: onComplete
+            )
+            updatePixelLastFireDate(pixel: pixel)
+        } else {
+            onComplete(nil)
+        }
+    }
+
     private static func updatePixelLastFireDate(pixel: Pixel.Event) {
         storage.set(Date(), forKey: pixel.name)
     }

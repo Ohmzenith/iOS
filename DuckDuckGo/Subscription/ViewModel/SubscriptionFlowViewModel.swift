@@ -256,7 +256,7 @@ final class SubscriptionFlowViewModel: ObservableObject {
             self.resetState()
             self.webViewModel.navigationCoordinator.navigateTo(url: self.purchaseURL )
         }
-        Pixel.fire(pixel: .privacyProOfferScreenImpression, debounce: 2)
+        Pixel.fireCount(pixel: .privacyProOfferScreenImpression, debounce: 2)
         await self.setupTransactionObserver()
         await self .setupWebViewObservers()
     }

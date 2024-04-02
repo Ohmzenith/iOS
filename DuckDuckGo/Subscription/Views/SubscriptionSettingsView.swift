@@ -43,7 +43,7 @@ struct SubscriptionSettingsView: View {
     var body: some View {
         optionsView
             .onAppear(perform: {
-                Pixel.fire(pixel: .privacyProSubscriptionSettings, debounce: 1)
+                Pixel.fireCount(pixel: .privacyProSubscriptionSettings, debounce: 1)
         })
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -74,7 +74,7 @@ struct SubscriptionSettingsView: View {
                     .foregroundColor(Color.init(designSystemColor: .accent))
             },
                                action: {
-                Pixel.fire(pixel: .privacyProSubscriptionManagementPlanBilling, debounce: 1)
+                Pixel.fireCount(pixel: .privacyProSubscriptionManagementPlanBilling, debounce: 1)
                 Task { viewModel.manageSubscription() }
                                 },
                                isButton: true)
@@ -187,7 +187,7 @@ struct SubscriptionSettingsView: View {
                 primaryButton: .cancel(Text(UserText.subscriptionRemoveCancel)) {
                 },
                 secondaryButton: .destructive(Text(UserText.subscriptionRemove)) {
-                    Pixel.fire(pixel: .privacyProSubscriptionManagementRemoval)
+                    Pixel.fireCount(pixel: .privacyProSubscriptionManagementRemoval)
                     viewModel.removeSubscription()
                     presentationMode.wrappedValue.dismiss()
                 }

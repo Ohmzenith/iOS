@@ -225,7 +225,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature, ObservableObjec
             // Check for active subscriptions
             if await PurchaseManager.hasActiveSubscription() {
                 setTransactionError(.hasActiveSubscription)
-                Pixel.fire(pixel: .privacyProRestoreAfterPurchaseAttempt)
+                Pixel.fireCount(pixel: .privacyProRestoreAfterPurchaseAttempt)
                 return nil
             }
             
@@ -295,7 +295,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature, ObservableObjec
     }
 
     func activateSubscription(params: Any, original: WKScriptMessage) async -> Encodable? {
-        Pixel.fire(pixel: .privacyProRestorePurchaseOfferPageEntry, debounce: 2)
+        Pixel.fireCount(pixel: .privacyProRestorePurchaseOfferPageEntry, debounce: 2)
         onActivateSubscription?()
         return nil
     }

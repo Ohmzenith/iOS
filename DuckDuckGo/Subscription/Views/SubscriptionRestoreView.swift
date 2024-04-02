@@ -154,7 +154,7 @@ struct SubscriptionRestoreView: View {
 
             switch source {
             case .addAnotherDevice:
-                Pixel.fire(pixel: .privacyProSettingsAddDevice, debounce: 2)
+                Pixel.fireCount(pixel: .privacyProSettingsAddDevice, debounce: 2)
             default: break
             }
         }
@@ -207,7 +207,7 @@ struct SubscriptionRestoreView: View {
                         .foregroundColor(Color(designSystemColor: .textSecondary))
                     getCellButton(buttonText: UserText.subscriptionRestoreAddEmailButton,
                                   action: {
-                        Pixel.fire(pixel: .privacyProAddDeviceEnterEmail, debounce: 1)
+                        Pixel.fireCount(pixel: .privacyProAddDeviceEnterEmail, debounce: 1)
                         viewModel.showActivationFlow(true)
                     })
                 } else {
@@ -218,7 +218,7 @@ struct SubscriptionRestoreView: View {
                     HStack {
                         getCellButton(buttonText: UserText.subscriptionManageEmailButton,
                                       action: {
-                            Pixel.fire(pixel: .privacyProSubscriptionManagementEmail, debounce: 1)
+                            Pixel.fireCount(pixel: .privacyProSubscriptionManagementEmail, debounce: 1)
                             viewModel.showActivationFlow(true)
                         })
                     }

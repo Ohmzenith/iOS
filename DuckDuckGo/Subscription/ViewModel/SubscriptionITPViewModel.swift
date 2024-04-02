@@ -151,7 +151,7 @@ final class SubscriptionITPViewModel: ObservableObject {
     func initializeView() {
         webViewModel.navigationCoordinator.navigateTo(url: manageITPURL )
         Task { await setupSubscribers() }
-        Pixel.fire(pixel: .privacyProIdentityRestorationSettings)
+        Pixel.fireCount(pixel: .privacyProIdentityRestorationSettings)
     }
     
     private func downloadAttachment(from url: URL) async {

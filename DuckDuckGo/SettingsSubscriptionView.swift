@@ -17,12 +17,15 @@
 //  limitations under the License.
 //
 
+#if SUBSCRIPTION
+
 import SwiftUI
 import UIKit
-
-#if SUBSCRIPTION
-import Subscription
+import PixelKit
 import Core
+
+import Subscription
+
 @available(iOS 15.0, *)
 struct SettingsSubscriptionView: View {
     
@@ -89,7 +92,7 @@ struct SettingsSubscriptionView: View {
                 .navigationViewStyle(.stack)
                 .environmentObject(subscriptionNavigationCoordinator)
                 .onFirstAppear {
-                    Pixel.fire(pixel: .privacyProRestorePurchaseClick)
+                    PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseClick)
                 }
 
             NavigationLink(destination: subscribeView,

@@ -28,6 +28,7 @@ import UserScript
 import Combine
 import Subscription
 import Core
+import PixelKit
 
 enum SubscriptionTransactionStatus {
     case idle, purchasing, restoring, polling
@@ -207,7 +208,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature, ObservableObjec
     func subscriptionSelected(params: Any, original: WKScriptMessage) async -> Encodable? {
         
         await withTransactionInProgress {
-            DailyPixel.fireDailyAndCount(pixel: .privacyProPurchaseAttempt)
+            PixelKit.fire(PrivacyProPixel.privacyProPurchaseAttempt, frequency: .dailyAndCount)
             setTransactionError(nil)
             setTransactionStatus(.purchasing)
             resetSubscriptionFlow()
@@ -225,7 +226,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature, ObservableObjec
             // Check for active subscriptions
             if await PurchaseManager.hasActiveSubscription() {
                 setTransactionError(.hasActiveSubscription)
-                Pixel.fire(pixel: .privacyProRestoreAfterPurchaseAttempt)
+                PixelKit.fire(PrivacyProPixel.privacyProRestoreAfterPurchaseAttempt)
                 return nil
             }
             
@@ -261,8 +262,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature, ObservableObjec
             switch await AppStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS,
                                                                            subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
             case .success(let purchaseUpdate):
-                DailyPixel.fireDailyAndCount(pixel: .privacyProPurchaseSuccess)
-                UniquePixel.fire(pixel: .privacyProSubscriptionActivated)
+                PixelKit.fire(PrivacyProPixel.privacyProPurchaseSuccess, frequency: .dailyAndCount)
+                PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActivated, frequency: .unique)
                 await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
             case .failure:
                 setTransactionError(.missingEntitlements)
@@ -295,7 +296,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature, ObservableObjec
     }
 
     func activateSubscription(params: Any, original: WKScriptMessage) async -> Encodable? {
-        Pixel.fire(pixel: .privacyProRestorePurchaseOfferPageEntry, debounce: 2)
+        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseOfferPageEntry)
         onActivateSubscription?()
         return nil
     }
@@ -342,12 +343,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature, ObservableObjec
     // MARK: Pixel related actions
 
     func subscriptionsMonthlyPriceClicked(params: Any, original: WKScriptMessage) async -> Encodable? {
-        Pixel.fire(pixel: .privacyProOfferMonthlyPriceClick)
+        PixelKit.fire(PrivacyProPixel.privacyProOfferMonthlyPriceClick)
         return nil
     }
 
     func subscriptionsYearlyPriceClicked(params: Any, original: WKScriptMessage) async -> Encodable? {
-        Pixel.fire(pixel: .privacyProOfferYearlyPriceClick)
+        PixelKit.fire(PrivacyProPixel.privacyProOfferYearlyPriceClick)
         return nil
     }
 
@@ -357,12 +358,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature, ObservableObjec
     }
 
     func subscriptionsAddEmailSuccess(params: Any, original: WKScriptMessage) async -> Encodable? {
-        UniquePixel.fire(pixel: .privacyProAddEmailSuccess)
+        PixelKit.fire(PrivacyProPixel.privacyProAddEmailSuccess, frequency: .unique)
         return nil
     }
 
     func subscriptionsWelcomeFaqClicked(params: Any, original: WKScriptMessage) async -> Encodable? {
-        UniquePixel.fire(pixel: .privacyProWelcomeFAQClick)
+        PixelKit.fire(PrivacyProPixel.privacyProWelcomeFAQClick, frequency: .unique)
         return nil
     }
 

@@ -17,13 +17,14 @@
 //  limitations under the License.
 //
 
+#if SUBSCRIPTION
 import Foundation
 import UserScript
 import Combine
 import Core
-
-#if SUBSCRIPTION
+import PixelKit
 import Subscription
+
 @available(iOS 15.0, *)
 final class SubscriptionITPViewModel: ObservableObject {
     
@@ -136,7 +137,7 @@ final class SubscriptionITPViewModel: ObservableObject {
     func onFirstAppear() {
         webViewModel.navigationCoordinator.navigateTo(url: manageITPURL )
         Task { await setupSubscribers() }
-        Pixel.fire(pixel: .privacyProIdentityRestorationSettings)
+        PixelKit.fire(PrivacyProPixel.privacyProIdentityRestorationSettings)
     }
     
     private func cleanUp() {

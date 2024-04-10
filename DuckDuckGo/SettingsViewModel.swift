@@ -24,7 +24,7 @@ import SwiftUI
 import Common
 import Combine
 import SyncUI
-
+import PixelKit
 
 #if SUBSCRIPTION
 import Subscription
@@ -818,8 +818,7 @@ extension SettingsViewModel {
 #if NETWORK_PROTECTION
         case .netP:
             if #available(iOS 15, *) {
-                firePixel(.privacyProVPNSettings,
-                          withAdditionalParameters: PixelExperiment.parameters)
+                PixelKit.fire(PrivacyProPixel.privacyProVPNSettings, withAdditionalParameters: PixelExperiment.parameters)
                 pushViewController(legacyViewProvider.netP)
             }
 #endif

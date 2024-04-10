@@ -17,13 +17,13 @@
 //  limitations under the License.
 //
 
+#if SUBSCRIPTION
 import Foundation
 import SwiftUI
 import DesignResourcesKit
 import Core
+import PixelKit
 
-
-#if SUBSCRIPTION
 @available(iOS 15.0, *)
 // swiftlint:disable type_body_length
 struct SubscriptionRestoreView: View {
@@ -190,8 +190,8 @@ struct SubscriptionRestoreView: View {
                             .foregroundColor(Color(designSystemColor: .textSecondary))
                         getCellButton(buttonText: UserText.subscriptionActivateEmailButton,
                                       action: {
-                            DailyPixel.fireDailyAndCount(pixel: .privacyProRestorePurchaseEmailStart)
-                            DailyPixel.fire(pixel: .privacyProWelcomeAddDevice)
+                            PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
+                            PixelKit.fire(PrivacyProPixel.privacyProWelcomeAddDevice, frequency: .legacyDaily)
                             viewModel.showActivationFlow(true)
                         })
                     } else if viewModel.state.subscriptionEmail == nil {
@@ -200,7 +200,7 @@ struct SubscriptionRestoreView: View {
                             .foregroundColor(Color(designSystemColor: .textSecondary))
                         getCellButton(buttonText: UserText.subscriptionRestoreAddEmailButton,
                                       action: {
-                            Pixel.fire(pixel: .privacyProAddDeviceEnterEmail, debounce: 1)
+                            PixelKit.fire(PrivacyProPixel.privacyProAddDeviceEnterEmail)
                             viewModel.showActivationFlow(true)
                         })
                     } else {
@@ -211,7 +211,7 @@ struct SubscriptionRestoreView: View {
                         HStack {
                             getCellButton(buttonText: UserText.subscriptionManageEmailButton,
                                           action: {
-                                Pixel.fire(pixel: .privacyProSubscriptionManagementEmail, debounce: 1)
+                                PixelKit.fire(PrivacyProPixel.privacyProSubscriptionManagementEmail)
                                 viewModel.showActivationFlow(true)
                             })
                         }

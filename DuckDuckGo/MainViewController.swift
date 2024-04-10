@@ -31,6 +31,7 @@ import Persistence
 import PrivacyDashboard
 import Networking
 import Suggestions
+import PixelKit
 
 #if SUBSCRIPTION
 import Subscription
@@ -1401,7 +1402,7 @@ class MainViewController: UIViewController {
         }
         dismiss(animated: true) {
             self.present(alertController, animated: true, completion: nil)
-            DailyPixel.fireDailyAndCount(pixel: .privacyProVPNAccessRevokedDialogShown)
+            PixelKit.fire(PrivacyProPixel.privacyProVPNAccessRevokedDialogShown, frequency: .dailyAndCount)
             self.tunnelDefaults.showEntitlementAlert = false
         }
     }
@@ -1434,9 +1435,9 @@ class MainViewController: UIViewController {
             }
 
             if await controller.isConnected {
-                DailyPixel.fireDailyAndCount(pixel: .privacyProVPNBetaStoppedWhenPrivacyProEnabled, withAdditionalParameters: [
-                    "reason": "entitlement-change"
-                ])
+                PixelKit.fire(PrivacyProPixel.privacyProVPNBetaStoppedWhenPrivacyProEnabled,
+                              frequency: .dailyAndCount,
+                              withAdditionalParameters: ["reason": "entitlement-change"])
             }
 
             await controller.stop()
@@ -1450,11 +1451,11 @@ class MainViewController: UIViewController {
             let controller = NetworkProtectionTunnelController()
             
             if await controller.isConnected {
-                DailyPixel.fireDailyAndCount(pixel: .privacyProVPNBetaStoppedWhenPrivacyProEnabled, withAdditionalParameters: [
-                    "reason": "account-signed-out"
-                ])
+                PixelKit.fire(PrivacyProPixel.privacyProVPNBetaStoppedWhenPrivacyProEnabled,
+                              frequency: .dailyAndCount,
+                              withAdditionalParameters: ["reason": "account-signed-out"])
             }
-
+            
             await controller.stop()
             await controller.removeVPN()
         }

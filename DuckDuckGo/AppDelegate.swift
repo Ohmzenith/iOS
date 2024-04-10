@@ -33,6 +33,7 @@ import Configuration
 import Networking
 import DDGSync
 import SyncDataProviders
+import PixelKit
 
 #if SUBSCRIPTION
 import Subscription
@@ -410,7 +411,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             #endif
         }
         window?.rootViewController?.present(alertController, animated: true) { [weak self] in
-            DailyPixel.fireDailyAndCount(pixel: .privacyProVPNAccessRevokedDialogShown)
+            PixelKit.fire(PrivacyProPixel.privacyProVPNAccessRevokedDialogShown, frequency: .dailyAndCount)
             self?.tunnelDefaults.showEntitlementAlert = false
         }
     }
@@ -427,7 +428,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private func presentVPNEarlyAccessOverAlert() {
         let alertController = CriticalAlerts.makeVPNEarlyAccessOverAlert()
         window?.rootViewController?.present(alertController, animated: true) { [weak self] in
-            DailyPixel.fireDailyAndCount(pixel: .privacyProPromotionDialogShownVPN)
+            PixelKit.fire(PrivacyProPixel.privacyProPromotionDialogShownVPN, frequency: .dailyAndCount)
             self?.tunnelDefaults.vpnEarlyAccessOverAlertAlreadyShown = true
         }
     }
@@ -562,10 +563,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         let isConnected = await controller.isConnected
 
-        DailyPixel.fireDailyAndCount(pixel: .privacyProVPNBetaStoppedWhenPrivacyProEnabled, withAdditionalParameters: [
-            "reason": reason,
-            "vpn-connected": String(isConnected)
-        ])
+        PixelKit.fire(PrivacyProPixel.privacyProVPNBetaStoppedWhenPrivacyProEnabled,
+                      frequency: .dailyAndCount,
+                      withAdditionalParameters: ["reason": reason, "vpn-connected": String(isConnected)])
 
         await controller.stop()
         await controller.removeVPN()
@@ -581,7 +581,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if case .success(let subscription) = await SubscriptionService.getSubscription(accessToken: token,
                                                                                            cachePolicy: .reloadIgnoringLocalCacheData) {
                 if subscription.isActive {
-                    DailyPixel.fire(pixel: .privacyProSubscriptionActive)
+                    PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .legacyDaily)
                 }
             }
 
@@ -633,7 +633,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             return
         }
 
-        DailyPixel.fire(pixel: .privacyProFeatureEnabled)
+        PixelKit.fire(PrivacyProPixel.privacyProFeatureEnabled, frequency: .legacyDaily)
 #endif
     }
 

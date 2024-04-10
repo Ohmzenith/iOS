@@ -16,18 +16,19 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
+#if SUBSCRIPTION
 
 import Foundation
 import Core
+import PixelKit
 
-#if SUBSCRIPTION
 @available(iOS 15.0, *)
 final class SubscriptionPIRViewModel: ObservableObject {
     
     var viewTitle = UserText.settingsPProDBPTitle
             
     func onFirstAppear() {
-        Pixel.fire(pixel: .privacyProPersonalInformationRemovalSettings)
+        PixelKit.fire(PrivacyProPixel.privacyProPersonalInformationRemovalSettings)
     }
 }
 #endif

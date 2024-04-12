@@ -976,6 +976,7 @@
 		F1A408A92BC6BD8000D03390 /* GeneralPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A408A82BC6BD8000D03390 /* GeneralPixel.swift */; };
 		F1A408AB2BC6BE1B00D03390 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F1A408AA2BC6BE1B00D03390 /* PixelKit */; };
 		F1A408AD2BC6BEDD00D03390 /* PrivacyProPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A408AC2BC6BEDD00D03390 /* PrivacyProPixel.swift */; };
+		F1A408AF2BC6D3C700D03390 /* AppDelegate+PixelKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A408AE2BC6D3C700D03390 /* AppDelegate+PixelKit.swift */; };
 		F1A886781F29394E0096251E /* WebCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A886771F29394E0096251E /* WebCacheManager.swift */; };
 		F1AE54E81F0425FC00D9A700 /* AuthenticationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AE54E71F0425FC00D9A700 /* AuthenticationViewController.swift */; };
 		F1BE54581E69DE1000FCF649 /* TutorialSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1BE54571E69DE1000FCF649 /* TutorialSettings.swift */; };
@@ -2706,6 +2707,7 @@
 		F198D7971E3A45D90088DA8A /* WKWebViewConfigurationExtensionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WKWebViewConfigurationExtensionTests.swift; sourceTree = "<group>"; };
 		F1A408A82BC6BD8000D03390 /* GeneralPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralPixel.swift; sourceTree = "<group>"; };
 		F1A408AC2BC6BEDD00D03390 /* PrivacyProPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyProPixel.swift; sourceTree = "<group>"; };
+		F1A408AE2BC6D3C700D03390 /* AppDelegate+PixelKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+PixelKit.swift"; sourceTree = "<group>"; };
 		F1A886771F29394E0096251E /* WebCacheManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebCacheManager.swift; sourceTree = "<group>"; };
 		F1AA54601E48D90700223211 /* NotificationCenter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NotificationCenter.framework; path = System/Library/Frameworks/NotificationCenter.framework; sourceTree = SDKROOT; };
 		F1AE54E71F0425FC00D9A700 /* AuthenticationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationViewController.swift; sourceTree = "<group>"; };
@@ -5560,6 +5562,7 @@
 				83BE9BC2215D69C1009844D9 /* AppConfigurationFetch.swift */,
 				CB24F70E29A3EB15006DCC58 /* AppConfigurationURLProvider.swift */,
 				84E341951E2F7EFB00BDBA6F /* AppDelegate.swift */,
+				F1A408AE2BC6D3C700D03390 /* AppDelegate+PixelKit.swift */,
 				85DB12EC2A1FED0C000A4A72 /* AppDelegate+AppDeepLinks.swift */,
 				4BCD14682B05BDD5000B1E4C /* AppDelegate+Waitlists.swift */,
 				F1564F022B7B915F00D454A6 /* AppDelegate+SKAD4.swift */,
@@ -7064,6 +7067,7 @@
 				4B0295192537BC6700E00CEF /* ConfigurationDebugViewController.swift in Sources */,
 				1E7A71192934EC6100B7EA19 /* OmniBarNotificationContainerView.swift in Sources */,
 				D60B1F272B9DDE5A00AE4760 /* SubscriptionGoogleView.swift in Sources */,
+				F1A408AF2BC6D3C700D03390 /* AppDelegate+PixelKit.swift in Sources */,
 				984D035C24AE15CD0066CFB8 /* TabSwitcherSettings.swift in Sources */,
 				D6E83C562B21ECC1006C8AFB /* SettingsLegacyViewProvider.swift in Sources */,
 				98B31292218CCB8C00E54DE1 /* AppDependencyProvider.swift in Sources */,

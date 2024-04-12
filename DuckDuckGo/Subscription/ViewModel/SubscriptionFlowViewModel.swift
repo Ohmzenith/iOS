@@ -17,14 +17,14 @@
 //  limitations under the License.
 //
 
+#if SUBSCRIPTION
 import Foundation
 import UserScript
 import Combine
 import Core
-
-
-#if SUBSCRIPTION
+import PixelKit
 import Subscription
+
 @available(iOS 15.0, *)
 final class SubscriptionFlowViewModel: ObservableObject {
     
@@ -108,13 +108,13 @@ final class SubscriptionFlowViewModel: ObservableObject {
              DispatchQueue.main.async {
                  switch feature {
                  case .netP:
-                     UniquePixel.fire(pixel: .privacyProWelcomeVPN)
+                     PixelKit.fire(PrivacyProPixel.privacyProWelcomeVPN, frequency: .unique)
                      self.state.selectedFeature = .netP
                  case .dbp:
-                     UniquePixel.fire(pixel: .privacyProWelcomePersonalInformationRemoval)
+                     PixelKit.fire(PrivacyProPixel.privacyProWelcomePersonalInformationRemoval, frequency: .unique)
                      self.state.selectedFeature = .dbp
                  case .itr:
-                     UniquePixel.fire(pixel: .privacyProWelcomeIdentityRestoration)
+                     PixelKit.fire(PrivacyProPixel.privacyProWelcomeIdentityRestoration, frequency: .unique)
                      self.state.selectedFeature = .itr
                  }
              }
@@ -172,24 +172,24 @@ final class SubscriptionFlowViewModel: ObservableObject {
         case .cancelledByUser:
             state.transactionError = nil
         case .accountCreationFailed:
-            DailyPixel.fireDailyAndCount(pixel: .privacyProPurchaseFailureAccountNotCreated)
+            PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailureAccountNotCreated, frequency: .dailyAndCount)
             state.transactionError = .generalError
         default:
             state.transactionError = .generalError
         }
 
         if isStoreError {
-            DailyPixel.fireDailyAndCount(pixel: .privacyProPurchaseFailureStoreError)
+            PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailureStoreError, frequency: .dailyAndCount)
         }
 
         if isBackendError {
-            DailyPixel.fireDailyAndCount(pixel: .privacyProPurchaseFailureBackendError)
+            PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailureBackendError, frequency: .dailyAndCount)
         }
 
         if state.transactionError != .hasActiveSubscription &&
            state.transactionError != .cancelledByUser {
             // The observer of `transactionError` does the same calculation, if the error is anything else than .hasActiveSubscription then shows a "Something went wrong" alert
-            DailyPixel.fireDailyAndCount(pixel: .privacyProPurchaseFailure)
+            PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .dailyAndCount)
         }
     }
     // swiftlint:enable cyclomatic_complexity
@@ -285,7 +285,7 @@ final class SubscriptionFlowViewModel: ObservableObject {
         }
         await self.setupTransactionObserver()
         await self.setupWebViewObservers()
-        Pixel.fire(pixel: .privacyProOfferScreenImpression)
+        PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
     }
 
     @MainActor

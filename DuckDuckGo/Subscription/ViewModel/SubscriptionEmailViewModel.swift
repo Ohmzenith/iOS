@@ -16,14 +16,14 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
-
+#if SUBSCRIPTION
 import Foundation
 import UserScript
 import Combine
 import Core
-
-#if SUBSCRIPTION
 import Subscription
+import PixelKit
+
 @available(iOS 15.0, *)
 final class SubscriptionEmailViewModel: ObservableObject {
     
@@ -141,8 +141,8 @@ final class SubscriptionEmailViewModel: ObservableObject {
         
         // Feature Callback
         subFeature.onSetSubscription = {
-            DailyPixel.fireDailyAndCount(pixel: .privacyProRestorePurchaseEmailSuccess)
-            UniquePixel.fire(pixel: .privacyProSubscriptionActivated)
+            PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailSuccess, frequency: .dailyAndCount)
+            PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActivated, frequency: .unique)
             DispatchQueue.main.async {
                 self.state.subscriptionActive = true
             }
@@ -157,17 +157,16 @@ final class SubscriptionEmailViewModel: ObservableObject {
             DispatchQueue.main.async {
                 switch feature {
                 case .netP:
-                    UniquePixel.fire(pixel: .privacyProWelcomeVPN)
+                    PixelKit.fire(PrivacyProPixel.privacyProWelcomeVPN, frequency: .unique)
                     self.state.selectedFeature = .netP
                 case .itr:
-                    UniquePixel.fire(pixel: .privacyProWelcomePersonalInformationRemoval)
+                    PixelKit.fire(PrivacyProPixel.privacyProWelcomePersonalInformationRemoval, frequency: .unique)
                     self.state.selectedFeature = .itr
                 case .dbp:
-                    UniquePixel.fire(pixel: .privacyProWelcomeIdentityRestoration)
+                    PixelKit.fire(PrivacyProPixel.privacyProWelcomeIdentityRestoration, frequency: .unique)
                     self.state.selectedFeature = .dbp
                 }
             }
-            
         }
           
         subFeature.$transactionError

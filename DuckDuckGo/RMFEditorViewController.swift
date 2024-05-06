@@ -20,6 +20,7 @@
 import Foundation
 import SwiftUI
 import RemoteMessaging
+import Core
 
 @available(iOS 16, *)
 class RMFEditorViewController: UIHostingController<RMFEditorView> {
@@ -33,6 +34,9 @@ class RMFEditorViewController: UIHostingController<RMFEditorView> {
 }
 
 class RMFEditorViewModel: ObservableObject {
+
+    @UserDefaultsWrapper(key: .debugRMFEditorJSON, defaultValue: nil)
+    var json: String?
 
     enum ModelType: CaseIterable, Identifiable {
         var id: Self { self }
@@ -115,21 +119,55 @@ class RMFEditorViewModel: ObservableObject {
     }
 
     init() {
+        messageViewModel = Self.initialMessageViewModel()
+
+        if let data = json?.data(using: .utf8),
+           let model = try? JSONDecoder().decode(RemoteMessageModel.self, from: data),
+           let content = model.content {
+            messageViewModel = HomeMessageViewModel(messageId: "test",
+                                                    modelType: content,
+                                                    onDidClose: { _ in },
+                                                    onDidAppear: {})
+        }
+
+    }
+
+    func reset() {
+        messageViewModel = Self.initialMessageViewModel()
+        persistJSON()
+    }
+
+    static func initialMessageViewModel() -> HomeMessageViewModel {
         let modelType: RemoteMessageModelType = .small(titleText: "Title", descriptionText: "Description")
-        messageViewModel = HomeMessageViewModel(messageId: "test",
-                                                 modelType: modelType,
-                                                 onDidClose: { _ in },
-                                                 onDidAppear: { })
+        return HomeMessageViewModel(messageId: "test",
+                                    modelType: modelType,
+                                    onDidClose: { _ in },
+                                    onDidAppear: { })
     }
 
     func updateMessage() {
         messageViewModel = HomeMessageViewModel(messageId: "test",
-                                                modelType: createModelType(),
+                                                modelType: createRemoteMessageContent(),
                                                 onDidClose: { _ in },
                                                 onDidAppear: { })
     }
 
-    private func createModelType() -> RemoteMessageModelType {
+    private func persistJSON() {
+
+        let messageModel = RemoteMessageModel(id: "test",
+                                              content: messageViewModel.modelType,
+                                              matchingRules: [],
+                                              exclusionRules: [])
+
+        if let data = try? JSONEncoder().encode(messageModel),
+           let message = String(bytes: data, encoding: .utf8) {
+            self.json = message
+            print("message", message)
+        }
+
+    }
+
+    private func createRemoteMessageContent() -> RemoteMessageModelType {
         switch modelType {
         case .small:
             return .small(titleText: titleText, descriptionText: descriptionText)
@@ -232,6 +270,23 @@ struct RMFEditorView: View {
             }
         }
         .navigationTitle("RMF Editor")
+        .toolbar {
+            ToolbarItem {
+                Button {
+                    model.reset()
+                } label: {
+                    Text("Reset")
+                }
+            }
+
+            ToolbarItem {
+                Button {
+                    model.reset()
+                } label: {
+                    Image(systemName: "square.and.arrow.up")
+                }
+            }
+        }
 
     }
 

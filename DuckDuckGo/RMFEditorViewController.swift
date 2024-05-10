@@ -30,7 +30,7 @@ class RMFEditorViewController: UIHostingController<RMFEditorView> {
     @MainActor required dynamic init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder, rootView: RMFEditorView(model: model))
     }
-    
+
 }
 
 class RMFEditorViewModel: ObservableObject {
@@ -150,6 +150,7 @@ class RMFEditorViewModel: ObservableObject {
                                                 modelType: createRemoteMessageContent(),
                                                 onDidClose: { _ in },
                                                 onDidAppear: { })
+        persistJSON()
     }
 
     private func persistJSON() {
@@ -204,90 +205,89 @@ struct RMFEditorView: View {
     @ObservedObject var model: RMFEditorViewModel
 
     var body: some View {
+        ZStack {
+            ScrollView {
+                VStack {
+                    HomeMessageView(viewModel: model.messageViewModel)
+                        .padding()
 
-        ScrollView {
-            VStack {
-                HomeMessageView(viewModel: model.messageViewModel)
-                    .padding()
+                    Divider()
 
-                HStack {
-                    Text("Model Type").font(.caption)
-                    Picker("Type", selection: $model.modelType) {
+                    VStack {
+                        HStack {
+                            Text("Model Type").font(.caption)
+                            Picker("Type", selection: $model.modelType) {
 
-                        Text("Small").tag(RMFEditorViewModel.ModelType.small)
-                        Text("Medium").tag(RMFEditorViewModel.ModelType.medium)
-                        Text("Big Single Action").tag(RMFEditorViewModel.ModelType.bigSingleAction)
-                        Text("Big Two Action").tag(RMFEditorViewModel.ModelType.bigTwoAction)
-                        Text("Promo Single Action").tag(RMFEditorViewModel.ModelType.promoSingleAction)
+                                Text("Small").tag(RMFEditorViewModel.ModelType.small)
+                                Text("Medium").tag(RMFEditorViewModel.ModelType.medium)
+                                Text("Big Single Action").tag(RMFEditorViewModel.ModelType.bigSingleAction)
+                                Text("Big Two Action").tag(RMFEditorViewModel.ModelType.bigTwoAction)
+                                Text("Promo Single Action").tag(RMFEditorViewModel.ModelType.promoSingleAction)
 
-                    }
-                }
-
-                NavigationView {
-                    Form {
-                        VStack {
-                            switch model.messageViewModel.modelType {
-                            case .small:
-                                EditableTextField("Title", text: $model.titleText)
-                                EditableTextField("Description", text: $model.descriptionText)
-
-                            case .medium:
-                                EditableTextField("Title", text: $model.titleText)
-                                EditableTextField("Description", text: $model.descriptionText)
-                                PlacholderPicker(placeholder: $model.placeholder)
-
-                            case .bigSingleAction:
-                                EditableTextField("Title", text: $model.titleText)
-                                EditableTextField("Description", text: $model.descriptionText)
-                                PlacholderPicker(placeholder: $model.placeholder)
-
-                                EditableTextField("Primary", text: $model.primaryText)
-
-                                // TODO action picker
-
-                            case .bigTwoAction:
-                                EditableTextField("Title", text: $model.titleText)
-                                EditableTextField("Description", text: $model.descriptionText)
-                                PlacholderPicker(placeholder: $model.placeholder)
-
-                                EditableTextField("Primary", text: $model.primaryText)
-                                EditableTextField("Secondary", text: $model.secondaryText)
-
-                                // TODO action pickers
-
-                            case .promoSingleAction:
-                                EditableTextField("Title", text: $model.titleText)
-                                EditableTextField("Description", text: $model.descriptionText)
-                                PlacholderPicker(placeholder: $model.placeholder)
-
-                                EditableTextField("Action", text: $model.actionText)
-                                // TODO action pickers
                             }
                         }
+
+                        switch model.messageViewModel.modelType {
+                        case .small:
+                            EditableTextField("Title", text: $model.titleText)
+                            EditableTextField("Description", text: $model.descriptionText)
+
+                        case .medium:
+                            EditableTextField("Title", text: $model.titleText)
+                            EditableTextField("Description", text: $model.descriptionText)
+                            PlacholderPicker(placeholder: $model.placeholder)
+
+                        case .bigSingleAction:
+                            EditableTextField("Title", text: $model.titleText)
+                            EditableTextField("Description", text: $model.descriptionText)
+                            PlacholderPicker(placeholder: $model.placeholder)
+
+                            EditableTextField("Primary", text: $model.primaryText)
+
+                            // TODO action picker
+
+                        case .bigTwoAction:
+                            EditableTextField("Title", text: $model.titleText)
+                            EditableTextField("Description", text: $model.descriptionText)
+                            PlacholderPicker(placeholder: $model.placeholder)
+
+                            EditableTextField("Primary", text: $model.primaryText)
+                            EditableTextField("Secondary", text: $model.secondaryText)
+
+                            // TODO action pickers
+
+                        case .promoSingleAction:
+                            EditableTextField("Title", text: $model.titleText)
+                            EditableTextField("Description", text: $model.descriptionText)
+                            PlacholderPicker(placeholder: $model.placeholder)
+
+                            EditableTextField("Action", text: $model.actionText)
+                            // TODO action pickers
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+            }
+            .navigationTitle("RMF Editor")
+            .toolbar {
+                ToolbarItem {
+                    Button {
+                        model.reset()
+                    } label: {
+                        Text("Reset")
                     }
                 }
-                .padding(.horizontal)
-            }
-        }
-        .navigationTitle("RMF Editor")
-        .toolbar {
-            ToolbarItem {
-                Button {
-                    model.reset()
-                } label: {
-                    Text("Reset")
+
+                ToolbarItem {
+                    Button {
+                        model.reset()
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                    }
                 }
             }
-
-            ToolbarItem {
-                Button {
-                    model.reset()
-                } label: {
-                    Image(systemName: "square.and.arrow.up")
-                }
-            }
-        }
-
+            .scrollContentBackground(.hidden)
+        }.background(Color(designSystemColor: .background))
     }
 
 }

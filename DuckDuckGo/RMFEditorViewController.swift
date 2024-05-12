@@ -22,7 +22,7 @@ import SwiftUI
 import RemoteMessaging
 import Core
 
-@available(iOS 16, *)
+@available(iOS 17, *)
 class RMFEditorViewController: UIHostingController<RMFEditorView> {
 
     let model = RMFEditorViewModel()
@@ -34,6 +34,153 @@ class RMFEditorViewController: UIHostingController<RMFEditorView> {
 }
 
 class RMFEditorViewModel: ObservableObject {
+
+    @Published var version = "0"
+    @Published var messages = [RMFMessageEditorViewModel]()
+    @Published var includedRules = [String]()
+    @Published var excludedRules = [String]()
+
+    func reset() {
+    }
+
+    func addMessage() {
+        messages.append(RMFMessageEditorViewModel())
+    }
+
+    func refresh(_ model: RMFMessageEditorViewModel) {
+        if let index = messages.firstIndex(of: model) {
+            messages[index] = model
+        }
+    }
+
+    private func persist() {
+
+//        let messageModel = RemoteMessageModel(id: "test",
+//                                              content: messageViewModel.modelType,
+//                                              matchingRules: [],
+//                                              exclusionRules: [])
+//
+//        if let data = try? JSONEncoder().encode(messageModel),
+//           let message = String(bytes: data, encoding: .utf8) {
+//            self.json = message
+//            print("message", message)
+//        }
+
+    }
+
+}
+
+@available(iOS 17, *)
+struct RMFEditorView: View {
+
+    @ObservedObject var model: RMFEditorViewModel
+
+    var body: some View {
+        NavigationStack {
+            List {
+
+                Section("Version") {
+                    TextField("Version", text: $model.version)
+                }
+
+                Section {
+                    ForEach(model.messages) { messageModel in
+                        NavigationLink(value: messageModel) {
+                            HStack {
+                                Image(messageModel.placeholder.remote.rawValue)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 75)
+
+                                VStack(alignment: .leading) {
+
+                                    Text(messageModel.titleText)
+                                        .font(.headline)
+
+                                    Text(messageModel.descriptionText)
+                                        .font(.subheadline)
+
+                                    Text("Included Rules:")
+                                        .font(.caption)
+                                        .bold() +
+                                    Text("None")
+                                        .font(.caption)
+
+                                    Text("Included Rules:")
+                                        .font(.caption)
+                                        .bold() +
+                                    Text("None")
+                                        .font(.caption)
+                                }
+                            }
+                        }
+                    }
+                } header: {
+                    HStack {
+                        Text("Messages")
+                        Spacer()
+                        Button {
+                            print("add message")
+                            model.addMessage()
+                        } label: {
+                            Image(systemName: "plus")
+                        }
+                    }
+                }
+
+                Section("Included Rules") {
+                    ForEach(model.includedRules, id: \.self) { rule in
+                        Text(rule)
+                    }
+                }
+
+                Section("Excluded Rules") {
+                    ForEach(model.excludedRules, id: \.self) { rule in
+                        Text(rule)
+                    }
+                }
+            }
+            .navigationDestination(for: RMFMessageEditorViewModel.self, destination: { model in
+                RMFMessageEditorView(model: model)
+                    .onDisappear {
+                        print("*** disappear")
+                        self.model.refresh(model)
+                    }
+            })
+        }
+        .navigationTitle("RMF Editor")
+        .toolbar {
+            ToolbarItem {
+                Button {
+                    model.reset()
+                } label: {
+                    Text("Reset")
+                }
+            }
+
+            ToolbarItem {
+                Button {
+                    print("share")
+                } label: {
+                    Image(systemName: "square.and.arrow.up")
+                }
+            }
+        }
+    }
+
+}
+
+class RMFMessageEditorViewModel: ObservableObject, Identifiable, Hashable, Equatable {
+
+    static func == (lhs: RMFMessageEditorViewModel, rhs: RMFMessageEditorViewModel) -> Bool {
+        return lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+
+    let id = UUID()
 
     @UserDefaultsWrapper(key: .debugRMFEditorJSON, defaultValue: nil)
     var json: String?
@@ -121,20 +268,15 @@ class RMFEditorViewModel: ObservableObject {
     init() {
         messageViewModel = Self.initialMessageViewModel()
 
-        if let data = json?.data(using: .utf8),
-           let model = try? JSONDecoder().decode(RemoteMessageModel.self, from: data),
-           let content = model.content {
-            messageViewModel = HomeMessageViewModel(messageId: "test",
-                                                    modelType: content,
-                                                    onDidClose: { _ in },
-                                                    onDidAppear: {})
-        }
+//        if let data = json?.data(using: .utf8),
+//           let model = try? JSONDecoder().decode(RemoteMessageModel.self, from: data),
+//           let content = model.content {
+//            messageViewModel = HomeMessageViewModel(messageId: "test",
+//                                                    modelType: content,
+//                                                    onDidClose: { _ in },
+//                                                    onDidAppear: {})
+//        }
 
-    }
-
-    func reset() {
-        messageViewModel = Self.initialMessageViewModel()
-        persistJSON()
     }
 
     static func initialMessageViewModel() -> HomeMessageViewModel {
@@ -150,22 +292,6 @@ class RMFEditorViewModel: ObservableObject {
                                                 modelType: createRemoteMessageContent(),
                                                 onDidClose: { _ in },
                                                 onDidAppear: { })
-        persistJSON()
-    }
-
-    private func persistJSON() {
-
-        let messageModel = RemoteMessageModel(id: "test",
-                                              content: messageViewModel.modelType,
-                                              matchingRules: [],
-                                              exclusionRules: [])
-
-        if let data = try? JSONEncoder().encode(messageModel),
-           let message = String(bytes: data, encoding: .utf8) {
-            self.json = message
-            print("message", message)
-        }
-
     }
 
     private func createRemoteMessageContent() -> RemoteMessageModelType {
@@ -200,9 +326,9 @@ class RMFEditorViewModel: ObservableObject {
 }
 
 @available(iOS 16, *)
-struct RMFEditorView: View {
+struct RMFMessageEditorView: View {
 
-    @ObservedObject var model: RMFEditorViewModel
+    @ObservedObject var model: RMFMessageEditorViewModel
 
     var body: some View {
         ZStack {
@@ -218,11 +344,11 @@ struct RMFEditorView: View {
                             Text("Model Type").font(.caption)
                             Picker("Type", selection: $model.modelType) {
 
-                                Text("Small").tag(RMFEditorViewModel.ModelType.small)
-                                Text("Medium").tag(RMFEditorViewModel.ModelType.medium)
-                                Text("Big Single Action").tag(RMFEditorViewModel.ModelType.bigSingleAction)
-                                Text("Big Two Action").tag(RMFEditorViewModel.ModelType.bigTwoAction)
-                                Text("Promo Single Action").tag(RMFEditorViewModel.ModelType.promoSingleAction)
+                                Text("Small").tag(RMFMessageEditorViewModel.ModelType.small)
+                                Text("Medium").tag(RMFMessageEditorViewModel.ModelType.medium)
+                                Text("Big Single Action").tag(RMFMessageEditorViewModel.ModelType.bigSingleAction)
+                                Text("Big Two Action").tag(RMFMessageEditorViewModel.ModelType.bigTwoAction)
+                                Text("Promo Single Action").tag(RMFMessageEditorViewModel.ModelType.promoSingleAction)
 
                             }
                         }
@@ -268,24 +394,6 @@ struct RMFEditorView: View {
                     .padding(.horizontal)
                 }
             }
-            .navigationTitle("RMF Editor")
-            .toolbar {
-                ToolbarItem {
-                    Button {
-                        model.reset()
-                    } label: {
-                        Text("Reset")
-                    }
-                }
-
-                ToolbarItem {
-                    Button {
-                        model.reset()
-                    } label: {
-                        Image(systemName: "square.and.arrow.up")
-                    }
-                }
-            }
             .scrollContentBackground(.hidden)
         }.background(Color(designSystemColor: .background))
     }
@@ -317,11 +425,11 @@ struct EditableTextField: View {
 
 struct PlacholderPicker: View {
 
-    @Binding var placeholder: RMFEditorViewModel.Placeholder
+    @Binding var placeholder: RMFMessageEditorViewModel.Placeholder
 
     var body: some View {
         Picker("Placeholder", selection: $placeholder) {
-            ForEach(RMFEditorViewModel.Placeholder.allCases) {
+            ForEach(RMFMessageEditorViewModel.Placeholder.allCases) {
                 Text("\($0)").tag($0)
             }
         }

@@ -264,6 +264,8 @@ class RMFMessageEditorViewModel: ObservableObject, Identifiable, Hashable, Equat
             updateMessage()
         }
     }
+    var maxMessageWidth = UIDevice.current.userInterfaceIdiom == .pad ?
+        HomeMessageCollectionViewCell.maximumWidth : HomeMessageCollectionViewCell.maximumWidthPad
 
     init() {
         messageViewModel = Self.initialMessageViewModel()
@@ -326,7 +328,7 @@ class RMFMessageEditorViewModel: ObservableObject, Identifiable, Hashable, Equat
 }
 
 @available(iOS 16, *)
-struct RMFMessageEditorView: View {
+private struct RMFMessageEditorView: View {
 
     @ObservedObject var model: RMFMessageEditorViewModel
 
@@ -335,13 +337,16 @@ struct RMFMessageEditorView: View {
             ScrollView {
                 VStack {
                     HomeMessageView(viewModel: model.messageViewModel)
+                        .frame(maxWidth: model.maxMessageWidth)
                         .padding()
 
                     Divider()
 
-                    VStack {
-                        HStack {
-                            Text("Model Type").font(.caption)
+                    Grid(alignment: .leading) {
+                        GridRow {
+                            Text("Model Type")
+                                .bold()
+
                             Picker("Type", selection: $model.modelType) {
 
                                 Text("Small").tag(RMFMessageEditorViewModel.ModelType.small)
@@ -353,42 +358,54 @@ struct RMFMessageEditorView: View {
                             }
                         }
 
+                        // Common
+                        GridRow(alignment: .top) {
+                            EditableTextField("Title", text: $model.titleText)
+                        }
+
+                        // Common
+                        GridRow(alignment: .top) {
+                            EditableTextField("Description", text: $model.descriptionText)
+                        }
+
+                        // Placeholder icon
                         switch model.messageViewModel.modelType {
-                        case .small:
-                            EditableTextField("Title", text: $model.titleText)
-                            EditableTextField("Description", text: $model.descriptionText)
+                        case .medium, .bigSingleAction, .bigTwoAction, .promoSingleAction:
+                            GridRow(alignment: .top) {
+                                Text("Placeholder")
+                                PlacholderPicker(placeholder: $model.placeholder)
+                            }
 
-                        case .medium:
-                            EditableTextField("Title", text: $model.titleText)
-                            EditableTextField("Description", text: $model.descriptionText)
-                            PlacholderPicker(placeholder: $model.placeholder)
+                        default: EmptyView()
+                        }
 
-                        case .bigSingleAction:
-                            EditableTextField("Title", text: $model.titleText)
-                            EditableTextField("Description", text: $model.descriptionText)
-                            PlacholderPicker(placeholder: $model.placeholder)
+                        // Primary text/action
+                        switch model.messageViewModel.modelType {
+                        case .bigSingleAction, .bigTwoAction:
+                            GridRow(alignment: .top) {
+                                EditableTextField("Primary", text: $model.primaryText)
+                            }
 
-                            EditableTextField("Primary", text: $model.primaryText)
+                        default: EmptyView()
+                        }
 
-                            // TODO action picker
-
+                        switch model.messageViewModel.modelType {
                         case .bigTwoAction:
-                            EditableTextField("Title", text: $model.titleText)
-                            EditableTextField("Description", text: $model.descriptionText)
-                            PlacholderPicker(placeholder: $model.placeholder)
+                            GridRow(alignment: .top) {
+                                EditableTextField("Secondary", text: $model.secondaryText)
+                            }
 
-                            EditableTextField("Primary", text: $model.primaryText)
-                            EditableTextField("Secondary", text: $model.secondaryText)
+                        default: EmptyView()
+                        }
 
-                            // TODO action pickers
-
+                        // Stand alone action
+                        switch model.messageViewModel.modelType {
                         case .promoSingleAction:
-                            EditableTextField("Title", text: $model.titleText)
-                            EditableTextField("Description", text: $model.descriptionText)
-                            PlacholderPicker(placeholder: $model.placeholder)
+                            GridRow(alignment: .top) {
+                                EditableTextField("Action", text: $model.actionText)
+                            }
 
-                            EditableTextField("Action", text: $model.actionText)
-                            // TODO action pickers
+                        default: EmptyView()
                         }
                     }
                     .padding(.horizontal)
@@ -400,7 +417,7 @@ struct RMFMessageEditorView: View {
 
 }
 
-struct EditableTextField: View {
+private struct EditableTextField: View {
 
     var label: String
     var text: Binding<String>
@@ -411,19 +428,20 @@ struct EditableTextField: View {
     }
 
     var body: some View {
-        HStack {
+        Group {
             Text(label).bold()
             VStack(spacing: 2) {
                 TextField("", text: text)
-                    .font(.caption)
                 Divider()
             }
+            .padding(.leading, 10)
+            .padding(.bottom, 8)
         }
     }
 
 }
 
-struct PlacholderPicker: View {
+private struct PlacholderPicker: View {
 
     @Binding var placeholder: RMFMessageEditorViewModel.Placeholder
 
